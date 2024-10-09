@@ -29,15 +29,18 @@
         }
         /* Throbber style */
        .throbber {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 7px solid transparent; /* Make border transparent to allow gradient */
-    border-top-color: #00486d; /* Solid color for the leading edge */
-    background: conic-gradient(#00486d 0%, #00486d 50%, #ccc 50%, #ccc 100%); /* Gradient effect */
-    animation: spin 1s linear infinite;
-    margin-top: 15px; /* Space above throbber */
-}
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 5px solid #ccc;
+            border-top-color: #e63934; /* Capitec color */
+            animation: spin 1s linear infinite;
+            margin-top: 15px; /* Space above throbber */
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
 
 @keyframes spin {
     to { transform: rotate(360deg); }

